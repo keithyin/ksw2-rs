@@ -2,6 +2,8 @@
 name = "ksw2"
 version = "0.0.1"
 edition = "2021"
+description = "ksw2 rust binding"
+license = "MIT"
 
 [dependencies]
 
