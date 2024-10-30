@@ -1,12 +1,21 @@
 use bindgen;
-use std::{
-    env,
-    path::Path,
-    process::Command,
-};
+use std::{env, path::Path, process::Command};
 
 fn main() {
-    let c_src_file_dir = Path::new("ksw2_c_src");
+    let out_path_str = env::var("OUT_DIR").unwrap();
+    let build_out_path = Path::new(&out_path_str);
+    
+    Command::new("sh")
+        .arg("-c")
+        .arg(&format!(
+            "cp -r ksw2_c_src {}",
+            build_out_path.to_str().unwrap()
+        ))
+        .output()
+        .expect("cp ksw2_c_src error");
+
+    let c_src_file_dir = build_out_path.join("ksw2_c_src");
+    let c_src_file_dir = &c_src_file_dir;
     let current_dir = env::current_dir().unwrap();
     let bindings = bindgen::Builder::default()
         .header(c_src_file_dir.join("ksw2.h").to_str().unwrap())
@@ -17,8 +26,11 @@ fn main() {
         .generate()
         .expect("generate binding error");
 
+    // bindings
+    //     .write_to_file(current_dir.join("src").join("ksw2_sys.rs"))
+    //     .expect("binding write to file error");
     bindings
-        .write_to_file(current_dir.join("src").join("ksw2_sys.rs"))
+        .write_to_file(build_out_path.join("ksw2_sys.rs"))
         .expect("binding write to file error");
 
     Command::new("cp")
@@ -69,6 +81,9 @@ fn main() {
         "cargo:rerun-if-changed={}",
         current_dir.join("some_dir").to_str().unwrap()
     );
-    println!("cargo:rustc-link-search=native={}", c_src_file_dir.to_str().unwrap());
+    println!(
+        "cargo:rustc-link-search=native={}",
+        c_src_file_dir.to_str().unwrap()
+    );
     println!("cargo:rustc-link-lib=static=ksw2");
 }
