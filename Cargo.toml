@@ -1,9 +1,10 @@
 [package]
 name = "ksw2"
-version = "0.0.2"
+version = "0.0.3"
 edition = "2021"
 description = "ksw2 rust binding"
 license = "MIT"
+repository ="https://github.com/keithyin/ksw2-rs"
 
 [dependencies]
 
